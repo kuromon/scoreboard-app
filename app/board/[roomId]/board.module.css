@@ -1,0 +1,60 @@
+.main {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #0f172a;
+}
+
+.panel {
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.home {
+  background: #14532d;
+}
+
+.away {
+  background: #7f1d1d;
+}
+
+.teamName {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.score {
+  font-size: 180px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.status {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px), (orientation: portrait) {
+  .main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .teamName {
+    font-size: 24px;
+  }
+
+  .score {
+    font-size: 120px;
+  }
+}

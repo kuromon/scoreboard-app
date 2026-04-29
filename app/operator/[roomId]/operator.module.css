@@ -1,0 +1,192 @@
+.page {
+  min-height: 100vh;
+  background: #f3f6fb;
+  color: #142235;
+  padding: 24px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #d9e2ef;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #16a34a;
+}
+
+.links {
+  display: grid;
+  gap: 12px;
+}
+
+.linkButton,
+.primaryButton,
+.secondaryButton,
+.dangerButton,
+.scoreButton {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.linkButton {
+  background: #ffffff;
+  border: 1px solid #d9e2ef;
+  color: #142235;
+}
+
+.primaryButton {
+  background: #2563eb;
+  color: white;
+}
+
+.secondaryButton {
+  background: #eef2f7;
+  color: #334155;
+  border: 1px solid #d7e0ea;
+}
+
+.dangerButton {
+  background: #dc2626;
+  color: white;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #d9e2ef;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.inputGroup {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+}
+
+.scoreBox {
+  display: grid;
+  gap: 16px;
+}
+
+.teamHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.teamTitle {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.scoreValue {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.scoreActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.scoreButton {
+  min-height: 64px;
+  font-size: 24px;
+}
+
+.homeButton {
+  background: #14532d;
+  color: #ffffff;
+}
+
+.awayButton {
+  background: #7f1d1d;
+  color: #ffffff;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid #d9e2ef;
+}
+
+.modalActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+  }
+
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .scoreValue {
+    font-size: 40px;
+  }
+}
