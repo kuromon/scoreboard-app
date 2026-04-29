@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { loadScoreboard, saveScoreboard } from "@/lib/scoreboard";
 import { supabase } from "@/lib/supabase";
 import { clampScore } from "@/lib/room";
 import type { ConnectionStatus, ScoreboardState } from "@/lib/types";
@@ -16,7 +17,6 @@ export default function OperatorPage({ params }: Props) {
   const searchParams = useSearchParams();
   const [roomId, setRoomId] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("connecting");
-  const initialStateSentRef = useRef(false);
   const [showResetModal, setShowResetModal] = useState(false);
 
   const [state, setState] = useState<ScoreboardState>({
@@ -52,27 +52,34 @@ export default function OperatorPage({ params }: Props) {
   }, [roomId]);
 
   useEffect(() => {
-    initialStateSentRef.current = false;
+    if (!roomId) return;
+
+    let cancelled = false;
+
+    async function hydrateRoom() {
+      try {
+        const saved = await loadScoreboard(roomId);
+        if (!saved || cancelled) return;
+
+        setState(saved);
+      } catch (error) {
+        console.error("Failed to load scoreboard:", error);
+      }
+    }
+
+    void hydrateRoom();
+
+    return () => {
+      cancelled = true;
+    };
   }, [roomId]);
 
   useEffect(() => {
     if (!channel) return;
 
     channel
-      .on("broadcast", { event: "state" }, (payload) => {
-        console.log("state event:", payload);
-      })
       .on("broadcast", { event: "request-sync" }, () => {
         void sendCurrentState();
-      })
-      .subscribe((channelStatus) => {
-        console.log("channel status:", channelStatus);
-
-        if (channelStatus === "SUBSCRIBED") {
-          setStatus("live");
-        } else {
-          setStatus("connecting");
-        }
       })
       .subscribe((channelStatus) => {
         console.log("channel status:", channelStatus);
@@ -96,15 +103,22 @@ export default function OperatorPage({ params }: Props) {
   }, [channel]);
 
   async function broadcastState(nextState: ScoreboardState) {
-    if (!channel) return;
+    try {
+      const saved = await saveScoreboard(nextState);
 
-    setState(nextState);
+      setState(saved);
+      latestStateRef.current = saved;
 
-    await channel.send({
-      type: "broadcast",
-      event: "state",
-      payload: nextState,
-    });
+      if (!channel) return;
+
+      await channel.send({
+        type: "broadcast",
+        event: "state",
+        payload: saved,
+      });
+    } catch (error) {
+      console.error("Failed to save scoreboard:", error);
+    }
   }
 
   function updateScore(team: "home" | "away", delta: number) {

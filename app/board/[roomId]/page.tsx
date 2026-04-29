@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { ConnectionStatus, ScoreboardState } from "@/lib/types";
+import { loadScoreboard } from "@/lib/scoreboard";
 import styles from "./board.module.css";
 
 type Props = {
@@ -17,6 +18,30 @@ export default function BoardPage({ params }: Props) {
   useEffect(() => {
     params.then(({ roomId }) => setRoomId(roomId));
   }, [params]);
+
+  useEffect(() => {
+    if (!roomId) return;
+
+    let cancelled = false;
+
+    async function hydrateBoard() {
+      try {
+        const saved = await loadScoreboard(roomId);
+        if (!saved || cancelled) return;
+
+        setState(saved);
+        setStatus("live");
+      } catch (error) {
+        console.error("Failed to load board state:", error);
+      }
+    }
+
+    void hydrateBoard();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [roomId]);
 
   const channel = useMemo(() => {
     if (!roomId) return null;
@@ -45,15 +70,21 @@ export default function BoardPage({ params }: Props) {
               requestedAt: Date.now(),
             },
           });
-        } else {
+        } else if (
+          channelStatus === "CHANNEL_ERROR" ||
+          channelStatus === "TIMED_OUT" ||
+          channelStatus === "CLOSED"
+        ) {
           setStatus("reconnecting");
+        } else {
+          setStatus("connecting");
         }
       });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [channel]);
+  }, [channel, roomId]);
 
   return (
     <main className={styles.main}>
