@@ -17,7 +17,7 @@ export default function HomePage() {
       away: awayTeam.trim() || "Away",
     });
 
-    router.push(`/operator/${roomId}?${params.toString()}`);
+    router.push(`/operator/${roomId}`);
   }
 
   return (

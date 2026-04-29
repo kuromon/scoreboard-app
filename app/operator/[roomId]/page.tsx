@@ -1,28 +1,29 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { loadScoreboard, saveScoreboard } from "@/lib/scoreboard";
 import { supabase } from "@/lib/supabase";
 import { clampScore } from "@/lib/room";
 import type { ConnectionStatus, ScoreboardState } from "@/lib/types";
 import styles from "./operator.module.css";
+import { QRCodeSVG } from "qrcode.react";
 
 type Props = {
   params: Promise<{ roomId: string }>;
 };
 
 export default function OperatorPage({ params }: Props) {
-  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [roomId, setRoomId] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("connecting");
   const [showResetModal, setShowResetModal] = useState(false);
 
   const [state, setState] = useState<ScoreboardState>({
     roomId: "",
-    homeTeam: searchParams.get("home") || "Home",
-    awayTeam: searchParams.get("away") || "Away",
+    homeTeam: "Home",
+    awayTeam: "Away",
     homeScore: 0,
     awayScore: 0,
     updatedAt: Date.now(),
@@ -166,9 +167,9 @@ export default function OperatorPage({ params }: Props) {
   }, [roomId]);
 
   const operatorUrl = useMemo(() => {
-    if (typeof window === "undefined") return "";
-    return window.location.href;
-  }, [roomId]);
+    if (!roomId || typeof window === "undefined") return "";
+    return `${window.location.origin}${pathname}`;
+  }, [pathname, roomId]);
 
   async function copyText(value: string) {
     if (!value) return;
@@ -213,35 +214,72 @@ export default function OperatorPage({ params }: Props) {
           </div>
         </div>
 
-        <div className={styles.links}>
-          <Link
-            href={`/board/${roomId}`}
-            target="_blank"
-            className={styles.linkButton}
-          >
-            Open board page
-          </Link>
+        <div className={styles.qrGrid}>
+          <section className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h2>Board QR</h2>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => copyText(boardUrl)}
+                disabled={!boardUrl}
+              >
+                Copy link
+              </button>
+            </div>
 
-          <button
-            className={styles.secondaryButton}
-            onClick={() => copyText(boardUrl)}
-          >
-            Copy board URL
-          </button>
+            <div className={styles.qrCard}>
+              {boardUrl ? (
+                <>
+                  <QRCodeSVG
+                    value={boardUrl}
+                    size={180}
+                    bgColor="#ffffff"
+                    fgColor="#111111"
+                    level="M"
+                    includeMargin
+                  />
+                  <p className={styles.qrLabel}>Scan to open board page</p>
+                  <p className={styles.qrUrl}>{boardUrl}</p>
+                </>
+              ) : (
+                <p className={styles.qrLabel}>Preparing board QR...</p>
+              )}
+            </div>
+          </section>
 
-          <button
-            className={styles.secondaryButton}
-            onClick={() => copyText(operatorUrl)}
-          >
-            Copy operator URL
-          </button>
+          <section className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h2>Operator QR</h2>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => copyText(operatorUrl)}
+                disabled={!operatorUrl}
+              >
+                Copy link
+              </button>
+            </div>
 
-          <button
-            className={styles.secondaryButton}
-            onClick={() => void sendCurrentState()}
-          >
-            Sync board
-          </button>
+            <div className={styles.qrCard}>
+              {operatorUrl ? (
+                <>
+                  <QRCodeSVG
+                    value={operatorUrl}
+                    size={180}
+                    bgColor="#ffffff"
+                    fgColor="#111111"
+                    level="M"
+                    includeMargin
+                  />
+                  <p className={styles.qrLabel}>Scan to open operator page</p>
+                  <p className={styles.qrUrl}>{operatorUrl}</p>
+                </>
+              ) : (
+                <p className={styles.qrLabel}>Preparing operator QR...</p>
+              )}
+            </div>
+          </section>
         </div>
 
         <div className={styles.cardGrid}>
