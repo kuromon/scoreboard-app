@@ -22,13 +22,13 @@
 }
 
 .teamName {
-  font-size: 32px;
+  font-size: 64px;
   font-weight: 700;
   margin-bottom: 16px;
 }
 
 .score {
-  font-size: 180px;
+  font-size: 600px;
   font-weight: 800;
   line-height: 1;
 }
