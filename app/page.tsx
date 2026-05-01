@@ -6,16 +6,9 @@ import { generateRoomId } from "@/lib/room";
 
 export default function HomePage() {
   const router = useRouter();
-  const [homeTeam, setHomeTeam] = useState("");
-  const [awayTeam, setAwayTeam] = useState("");
 
   function handleCreateRoom() {
     const roomId = generateRoomId();
-
-    const params = new URLSearchParams({
-      home: homeTeam.trim() || "Home",
-      away: awayTeam.trim() || "Away",
-    });
 
     router.push(`/operator/${roomId}`);
   }
@@ -38,32 +31,9 @@ export default function HomePage() {
           padding: 24,
         }}
       >
-        <h1>Create scoreboard room</h1>
-        <p>Enter team names and generate a random room ID.</p>
+        <h1 style={{ textAlign: "center" }}>ONLINE SCOREBOARD</h1>
 
         <div style={{ display: "grid", gap: 12, marginTop: 20 }}>
-          <input
-            placeholder="Home team"
-            value={homeTeam}
-            onChange={(e) => setHomeTeam(e.target.value)}
-            style={{
-              padding: 12,
-              borderRadius: 12,
-              border: "1px solid #cbd5e1",
-            }}
-          />
-
-          <input
-            placeholder="Away team"
-            value={awayTeam}
-            onChange={(e) => setAwayTeam(e.target.value)}
-            style={{
-              padding: 12,
-              borderRadius: 12,
-              border: "1px solid #cbd5e1",
-            }}
-          />
-
           <button
             onClick={handleCreateRoom}
             style={{
