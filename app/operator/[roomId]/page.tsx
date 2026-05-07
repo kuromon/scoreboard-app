@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { loadScoreboard, saveScoreboard } from "@/lib/scoreboard";
 import { supabase } from "@/lib/supabase";
 import { clampScore } from "@/lib/room";
@@ -14,7 +14,6 @@ type Props = {
 };
 
 export default function OperatorPage({ params }: Props) {
-  const router = useRouter();
   const pathname = usePathname();
   const [roomId, setRoomId] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("connecting");
@@ -161,9 +160,19 @@ export default function OperatorPage({ params }: Props) {
     setShowResetModal(false);
   }
 
-  const boardUrl = useMemo(() => {
+  const splitBoardUrl = useMemo(() => {
     if (!roomId || typeof window === "undefined") return "";
     return `${window.location.origin}/board/${roomId}`;
+  }, [roomId]);
+
+  const homeBoardUrl = useMemo(() => {
+    if (!roomId || typeof window === "undefined") return "";
+    return `${window.location.origin}/board/${roomId}?view=home`;
+  }, [roomId]);
+
+  const awayBoardUrl = useMemo(() => {
+    if (!roomId || typeof window === "undefined") return "";
+    return `${window.location.origin}/board/${roomId}?view=away`;
   }, [roomId]);
 
   const operatorUrl = useMemo(() => {
@@ -214,73 +223,185 @@ export default function OperatorPage({ params }: Props) {
           </div>
         </div>
 
-        <div className={styles.qrGrid}>
-          <section className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h2>Board QR</h2>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={() => copyText(boardUrl)}
-                disabled={!boardUrl}
-              >
-                Copy link
-              </button>
+        <details className={styles.card}>
+          <summary className={styles.disclosureSummary}>
+            <div>
+              <h2>Display screens</h2>
+              <p className={styles.sectionHint}>
+                Open these on TVs or external displays.
+              </p>
             </div>
+            <span className={styles.chevron} aria-hidden="true">
+              ▾
+            </span>
+          </summary>
 
-            <div className={styles.qrCard}>
-              {boardUrl ? (
-                <>
-                  <QRCodeSVG
-                    value={boardUrl}
-                    size={180}
-                    bgColor="#ffffff"
-                    fgColor="#111111"
-                    level="M"
-                    includeMargin
-                  />
-                  <p className={styles.qrLabel}>Scan to open board page</p>
-                  <p className={styles.qrUrl}>{boardUrl}</p>
-                </>
-              ) : (
-                <p className={styles.qrLabel}>Preparing board QR...</p>
-              )}
-            </div>
-          </section>
+          <div className={styles.disclosureBody}>
+            <div className={styles.qrDisplayGrid}>
+              <article className={styles.qrItem}>
+                <div className={styles.qrItemHeader}>
+                  <h3>Split display</h3>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => copyText(splitBoardUrl)}
+                    disabled={!splitBoardUrl}
+                  >
+                    Copy link
+                  </button>
+                </div>
 
-          <section className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h2>Operator QR</h2>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={() => copyText(operatorUrl)}
-                disabled={!operatorUrl}
-              >
-                Copy link
-              </button>
-            </div>
+                <div className={styles.qrCard}>
+                  {splitBoardUrl ? (
+                    <>
+                      <QRCodeSVG
+                        value={splitBoardUrl}
+                        size={180}
+                        bgColor="#ffffff"
+                        fgColor="#111111"
+                        level="M"
+                        includeMargin
+                      />
+                      <p className={styles.qrLabel}>Scan to open split board</p>
+                      <p className={styles.qrUrl}>{splitBoardUrl}</p>
+                    </>
+                  ) : (
+                    <p className={styles.qrLabel}>
+                      Preparing split display QR...
+                    </p>
+                  )}
+                </div>
+              </article>
 
-            <div className={styles.qrCard}>
-              {operatorUrl ? (
-                <>
-                  <QRCodeSVG
-                    value={operatorUrl}
-                    size={180}
-                    bgColor="#ffffff"
-                    fgColor="#111111"
-                    level="M"
-                    includeMargin
-                  />
-                  <p className={styles.qrLabel}>Scan to open operator page</p>
-                  <p className={styles.qrUrl}>{operatorUrl}</p>
-                </>
-              ) : (
-                <p className={styles.qrLabel}>Preparing operator QR...</p>
-              )}
+              <article className={styles.qrItem}>
+                <div className={styles.qrItemHeader}>
+                  <h3>Home display</h3>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => copyText(homeBoardUrl)}
+                    disabled={!homeBoardUrl}
+                  >
+                    Copy link
+                  </button>
+                </div>
+
+                <div className={styles.qrCard}>
+                  {homeBoardUrl ? (
+                    <>
+                      <QRCodeSVG
+                        value={homeBoardUrl}
+                        size={180}
+                        bgColor="#ffffff"
+                        fgColor="#111111"
+                        level="M"
+                        includeMargin
+                      />
+                      <p className={styles.qrLabel}>
+                        Scan to open home-only board
+                      </p>
+                      <p className={styles.qrUrl}>{homeBoardUrl}</p>
+                    </>
+                  ) : (
+                    <p className={styles.qrLabel}>
+                      Preparing home display QR...
+                    </p>
+                  )}
+                </div>
+              </article>
+
+              <article className={styles.qrItem}>
+                <div className={styles.qrItemHeader}>
+                  <h3>Away display</h3>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => copyText(awayBoardUrl)}
+                    disabled={!awayBoardUrl}
+                  >
+                    Copy link
+                  </button>
+                </div>
+
+                <div className={styles.qrCard}>
+                  {awayBoardUrl ? (
+                    <>
+                      <QRCodeSVG
+                        value={awayBoardUrl}
+                        size={180}
+                        bgColor="#ffffff"
+                        fgColor="#111111"
+                        level="M"
+                        includeMargin
+                      />
+                      <p className={styles.qrLabel}>
+                        Scan to open away-only board
+                      </p>
+                      <p className={styles.qrUrl}>{awayBoardUrl}</p>
+                    </>
+                  ) : (
+                    <p className={styles.qrLabel}>
+                      Preparing away display QR...
+                    </p>
+                  )}
+                </div>
+              </article>
             </div>
-          </section>
-        </div>
+          </div>
+        </details>
+
+        <details className={styles.card}>
+          <summary className={styles.disclosureSummary}>
+            <div>
+              <h2>Operator access</h2>
+              <p className={styles.sectionHint}>
+                Open this on the scoring device.
+              </p>
+            </div>
+            <span className={styles.chevron} aria-hidden="true">
+              ▾
+            </span>
+          </summary>
+
+          <div className={styles.disclosureBody}>
+            <div className={styles.qrSingleWrap}>
+              <article className={styles.qrItem}>
+                <div className={styles.qrItemHeader}>
+                  <h3>Operator control</h3>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => copyText(operatorUrl)}
+                    disabled={!operatorUrl}
+                  >
+                    Copy link
+                  </button>
+                </div>
+
+                <div className={styles.qrCard}>
+                  {operatorUrl ? (
+                    <>
+                      <QRCodeSVG
+                        value={operatorUrl}
+                        size={180}
+                        bgColor="#ffffff"
+                        fgColor="#111111"
+                        level="M"
+                        includeMargin
+                      />
+                      <p className={styles.qrLabel}>
+                        Scan to open operator page
+                      </p>
+                      <p className={styles.qrUrl}>{operatorUrl}</p>
+                    </>
+                  ) : (
+                    <p className={styles.qrLabel}>Preparing operator QR...</p>
+                  )}
+                </div>
+              </article>
+            </div>
+          </div>
+        </details>
 
         <div className={styles.cardGrid}>
           <section className={styles.card}>

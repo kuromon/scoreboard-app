@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { ConnectionStatus, ScoreboardState } from "@/lib/types";
 import { loadScoreboard } from "@/lib/scoreboard";
@@ -11,9 +12,26 @@ type Props = {
 };
 
 export default function BoardPage({ params }: Props) {
+  const searchParams = useSearchParams();
+
   const [roomId, setRoomId] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("connecting");
   const [state, setState] = useState<ScoreboardState | null>(null);
+
+  const rawView = searchParams.get("view")?.toLowerCase();
+  const view =
+    rawView === "home" || rawView === "away" || rawView === "split"
+      ? rawView
+      : "split";
+
+  const isSplit = view === "split";
+  const isHomeOnly = view === "home";
+  const isAwayOnly = view === "away";
+
+  const homeTeam = state?.homeTeam || "Home";
+  const awayTeam = state?.awayTeam || "Away";
+  const homeScore = state?.homeScore ?? 0;
+  const awayScore = state?.awayScore ?? 0;
 
   useEffect(() => {
     params.then(({ roomId }) => setRoomId(roomId));
@@ -88,19 +106,37 @@ export default function BoardPage({ params }: Props) {
 
   return (
     <main className={styles.main}>
-      <section className={`${styles.panel} ${styles.home}`}>
-        <div>
-          <div className={styles.teamName}>{state?.homeTeam || "Home"}</div>
-          <div className={styles.score}>{state?.homeScore ?? 0}</div>
-        </div>
-      </section>
+      {isSplit && (
+        <div className={styles.splitBoard}>
+          <section className={`${styles.panel} ${styles.home}`}>
+            <div>
+              <div className={styles.teamName}>{homeTeam}</div>
+              <div className={styles.score}>{homeScore}</div>
+            </div>
+          </section>
 
-      <section className={`${styles.panel} ${styles.away}`}>
-        <div>
-          <div className={styles.teamName}>{state?.awayTeam || "Away"}</div>
-          <div className={styles.score}>{state?.awayScore ?? 0}</div>
+          <section className={`${styles.panel} ${styles.away}`}>
+            <div>
+              <div className={styles.teamName}>{awayTeam}</div>
+              <div className={styles.score}>{awayScore}</div>
+            </div>
+          </section>
         </div>
-      </section>
+      )}
+
+      {isHomeOnly && (
+        <section className={`${styles.singleBoard} ${styles.homeSingle}`}>
+          <div className={styles.singleTeamName}>{homeTeam}</div>
+          <div className={styles.singleScore}>{homeScore}</div>
+        </section>
+      )}
+
+      {isAwayOnly && (
+        <section className={`${styles.singleBoard} ${styles.awaySingle}`}>
+          <div className={styles.singleTeamName}>{awayTeam}</div>
+          <div className={styles.singleScore}>{awayScore}</div>
+        </section>
+      )}
 
       <div className={styles.status}>
         {status === "live" && "Live"}

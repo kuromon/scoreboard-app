@@ -1,60 +1,97 @@
 .main {
-  min-height: 100vh;
+  position: relative;
+  min-height: 100dvh;
+  width: 100%;
+  background: #08152c;
+  overflow: hidden;
+  color: white;
+}
+
+
+.splitBoard {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: #0f172a;
+  width: 100%;
+  min-height: 100dvh;
 }
 
 .panel {
-  color: #ffffff;
-  display: grid;
-  place-items: center;
-  padding: 24px;
+  min-width: 0;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
 .home {
-  background: #14532d;
+  background: #166534;
 }
 
 .away {
-  background: #7f1d1d;
+  background: #991b1b;
 }
 
 .teamName {
-  font-size: 64px;
+  font-size: clamp(32px, 4vw, 72px);
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .score {
-  font-size: 600px;
+  font-size: clamp(180px, 28vw, 420px);
+  line-height: 0.9;
   font-weight: 800;
-  line-height: 1;
 }
 
 .status {
   position: fixed;
   top: 16px;
   right: 16px;
-  background: #ffffff;
-  color: #0f172a;
+  z-index: 20;
+  padding: 8px 14px;
   border-radius: 999px;
-  padding: 8px 12px;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
 }
 
-@media (max-width: 768px), (orientation: portrait) {
-  .main {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
-  }
+.singleBoard {
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px;
+  gap: 24px;
+  color: white;
+}
 
-  .teamName {
-    font-size: 24px;
-  }
+.homeSingle {
+  background: #166534;
+}
 
-  .score {
-    font-size: 120px;
-  }
+.awaySingle {
+  background: #991b1b;
+}
+
+.singleLabel {
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.singleTeamName {
+  font-size: clamp(42px, 6vw, 96px);
+  font-weight: 700;
+}
+
+.singleScore {
+  font-size: clamp(220px, 38vw, 760px);
+  line-height: 0.82;
+  font-weight: 800;
 }
